@@ -57,12 +57,16 @@ def make_layout():
         Layout(name="footer", size=3)
     )
     layout["main"].split_row(
-        Layout(name="left"),
-        Layout(name="right", ratio=2),
+        Layout(name="left_side"),
+        Layout(name="right_side", ratio=2),
     )
-    layout["left"].split(
-        Layout(name="proxy_status"),
-        Layout(name="error_status")
+    layout["left_side"].split(
+        Layout(name="proxy_info"),
+        Layout(name="error_info")
+    )
+    layout["right_side"].split(
+        Layout(name="attack_stats"),
+        Layout(name="intel_report")
     )
     return layout
 
@@ -73,11 +77,9 @@ def run_dashboard_loop():
     
     with Live(layout, screen=True, redirect_stderr=False, vertical_overflow="visible", refresh_per_second=5) as live:
         while not config.stop_event.is_set():
-            # Panels
-            proxy_panel = Panel(Text(f"Tổng: [bold green]{config.attack_stats['proxy_total']}[/bold green]\nHoạt động: [bold cyan]{config.attack_stats['proxy_validated']}[/bold cyan]", justify="center"), title="[b]Proxy[/b]", border_style="yellow")
+            proxy_panel = Panel(Text(f"Tổng: [bold green]{config.attack_stats['proxy_total']:,}[/bold green]\nHoạt động: [bold cyan]{config.attack_stats['proxy_validated']:,}[/bold cyan]", justify="center"), title="[b]Proxy[/b]", border_style="yellow")
             error_panel = Panel(Text(f"Kết nối: [red]{config.attack_stats['connect_error']:,}[/red]\nTimeout: [red]{config.attack_stats['timeout_error']:,}[/red]\nHTTP: [red]{config.attack_stats['http_error']:,}[/red]", justify="left"), title="[b]Lỗi[/b]", border_style="red")
 
-            # Main Stats Table
             elapsed = max(time.time() - config.attack_stats["start_time"], 1)
             rps = config.attack_stats["requests_sent"] / elapsed
             total_ok = config.attack_stats["http_ok"]
@@ -97,15 +99,13 @@ def run_dashboard_loop():
 
             main_panel = Panel(stats_table, title="[b]Hiệu suất Tấn công[/b]", border_style="green")
             
-            # Threat Intelligence
             update_threat_intelligence()
             intel_panel = Panel(Text(config.attack_stats['threat_intelligence'], style="italic magenta"), title="[b]Tình báo Chiến thuật[/b]", border_style="magenta")
 
-            # Update Layout
-            layout["proxy_status"].update(proxy_panel)
-            layout["error_status"].update(error_panel)
-            layout["right"].update(Layout(name="main_and_intel"))
-            layout["main_and_intel"].split(main_panel, intel_panel)
+            layout["proxy_info"].update(proxy_panel)
+            layout["error_info"].update(error_panel)
+            layout["attack_stats"].update(main_panel)
+            layout["intel_report"].update(intel_panel)
 
             time.sleep(1/5)
 
@@ -116,7 +116,9 @@ def launch_dashboard():
     
 def update_threat_intelligence():
     total_req = config.attack_stats["requests_sent"] + config.attack_stats["sockets_opened"]
-    if total_req < 30: return
+    if total_req < 30: 
+        config.attack_stats["threat_intelligence"] = "Đang thu thập dữ liệu chiến trường..."
+        return
     
     total_ok = config.attack_stats["http_ok"]
     total_err = config.attack_stats["http_error"] + config.attack_stats["connect_error"] + config.attack_stats["timeout_error"]
@@ -127,5 +129,6 @@ def update_threat_intelligence():
             config.attack_stats["threat_intelligence"] = "Tỉ lệ lỗi cực cao. Các proxy gần như bị vô hiệu hóa. Hãy tìm nguồn proxy mới hoặc dừng chiến dịch."
         elif err_rate > 70:
             config.attack_stats["threat_intelligence"] = "Hệ thống phòng thủ của mục tiêu đang hoạt động rất hiệu quả. Cân nhắc chuyển sang chế độ 'Du kích' để tránh bị phát hiện."
-        elif total_ok > 200:
+        elif total_ok > 100:
             config.attack_stats["threat_intelligence"] = "Tấn công đang diễn ra ổn định. Máy chủ mục tiêu đang chịu áp lực lớn. Tiếp tục duy trì!"
+
