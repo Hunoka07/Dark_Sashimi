@@ -3,7 +3,7 @@ import threading
 
 VERSION = "2.0"
 CREATOR = "Created by TLG"
-PROJECT_NAME = "Dark Sashimi: AI Edition"
+PROJECT_NAME = "Dark Sashimi: AI"
 REQUIRED_PYTHON_VERSION = (3, 8)
 
 DEFAULT_THREADS = {
