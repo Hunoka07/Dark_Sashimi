@@ -1,35 +1,45 @@
+# -*- coding: utf-8 -*-
 import threading
 
 VERSION = "1.0"
 CREATOR = "Created by TLG"
-REQUIRED_PYTHON_VERSION = (3, 7)
+PROJECT_NAME = "Dark Sashimi"
+REQUIRED_PYTHON_VERSION = (3, 8)
 
 DEFAULT_THREADS = {
-    "Stealth": 50,
-    "Overload": 250,
-    "Blitz": 1000
+    "Guerilla": 75,
+    "Saturation": 350,
+    "Annihilation": 1500
 }
 
 PROXY_SOURCES = [
     "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt",
-    "https://raw.githubusercontent.com/proxy4free/proxy-list/main/http.txt",
-    "https://raw.githubusercontent.com/HyperBeats/proxy-list/main/http.txt"
+    "https://raw.githubusercontent.com/jetkai/proxy-list/main/online-proxies/txt/proxies-http.txt",
+    "https://raw.githubusercontent.com/proxiesmaster/Free-HTTPS-proxies/main/proxy.txt",
+    "https://raw.githubusercontent.com/Zaeem20/FREE_PROXIES_LIST/master/http.txt",
+    "https://raw.githubusercontent.com/prxchk/proxy-list/main/http.txt",
 ]
 
-USER_AGENT_URL = "https://raw.githubusercontent.com/datasets/top-user-agents/main/user-agents.json"
-PROXY_VALIDATION_TARGET = "http://httpbin.org/get"
-PROXY_TIMEOUT = 8
+USER_AGENT_URL = "https://raw.githubusercontent.com/elliotwutingfeng/latest-user-agents/main/latest-user-agents.json"
+PROXY_VALIDATION_TARGET = "https://httpbin.org/get"
+PROXY_TIMEOUT = 6
 
 attack_stats = {
     "requests_sent": 0,
     "sockets_opened": 0,
     "bytes_sent": 0,
-    "errors": 0,
+    "http_ok": 0,
+    "http_error": 0,
+    "connect_error": 0,
+    "timeout_error": 0,
     "start_time": 0,
     "active_threads": 0,
-    "threat_intelligence": "Initializing system..."
+    "proxy_total": 0,
+    "proxy_validated": 0,
+    "threat_intelligence": "Hệ thống sẵn sàng..."
 }
 
 stop_event = threading.Event()
 proxies = []
 user_agents = []
+
