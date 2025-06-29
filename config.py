@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 import threading
 
-VERSION = "1.0"
+VERSION = "2.0"
 CREATOR = "Created by TLG"
-PROJECT_NAME = "Dark Sashimi"
+PROJECT_NAME = "Dark Sashimi: AI Edition"
 REQUIRED_PYTHON_VERSION = (3, 8)
 
 DEFAULT_THREADS = {
     "Guerilla": 75,
-    "Saturation": 350,
-    "Annihilation": 1500
+    "Saturation": 400,
+    "Annihilation": 2000
 }
 
 PROXY_SOURCES = [
@@ -18,6 +18,8 @@ PROXY_SOURCES = [
     "https://raw.githubusercontent.com/proxiesmaster/Free-HTTPS-proxies/main/proxy.txt",
     "https://raw.githubusercontent.com/Zaeem20/FREE_PROXIES_LIST/master/http.txt",
     "https://raw.githubusercontent.com/prxchk/proxy-list/main/http.txt",
+    "https://raw.githubusercontent.com/saisuiu/Lionkings-Http-Proxys-Lists/main/free.txt",
+    "https://raw.githubusercontent.com/Anonym0usWork1221/Free-Proxies/main/proxy_files/http_proxies.txt",
 ]
 
 USER_AGENT_URL = "https://raw.githubusercontent.com/elliotwutingfeng/latest-user-agents/main/latest-user-agents.json"
@@ -42,4 +44,3 @@ attack_stats = {
 stop_event = threading.Event()
 proxies = []
 user_agents = []
-
