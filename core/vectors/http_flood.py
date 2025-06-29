@@ -47,7 +47,8 @@ class HTTPMatrix(threading.Thread):
         while not config.stop_event.is_set():
             proxy = get_random_proxy()
             headers = self.build_headers()
-            url_with_cache_bust = f"{self.target_url}?_={random.randint(1, 1e12)}"
+            # Dòng này đã được sửa lỗi, ép kiểu 1e12 thành số nguyên.
+            url_with_cache_bust = f"{self.target_url}?_={random.randint(1, int(1e12))}"
 
             try:
                 method = random.choice(['GET', 'POST', 'HEAD', 'OPTIONS'])
