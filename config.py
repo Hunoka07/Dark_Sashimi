@@ -13,20 +13,33 @@ DEFAULT_THREADS = {
 PROXY_TIMEOUT = 6
 
 PROXY_SOURCES = [
-    "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt",
+    
+    "https://raw.githubusercontent.com/vakhov/fresh-proxy-list/master/http.txt",
+    "https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/protocols/http/data.txt",
     "https://raw.githubusercontent.com/jetkai/proxy-list/main/online-proxies/txt/proxies-http.txt",
-    "https://raw.githubusercontent.com/proxiesmaster/Free-HTTPS-proxies/main/proxy.txt",
+    "https://raw.githubusercontent.com/ErcinDedeoglu/proxies/main/proxies/http.txt",
+    "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/http.txt",
     "https://raw.githubusercontent.com/Zaeem20/FREE_PROXIES_LIST/master/http.txt",
+    "https://raw.githubusercontent.com/VolkanSah/Auto-Proxy-Fetcher/main/proxies.txt",
+    "https://raw.githubusercontent.com/gfpcom/free-proxy-list/main/proxy_list/http.txt",
+    
+    
+    "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt",
+    "https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt",
+    "https://raw.githubusercontent.com/roosterkid/openproxylist/main/HTTPS_RAW.txt",
+    "https://raw.githubusercontent.com/zloi-user/hideip.me/main/http.txt",
+    "https://raw.githubusercontent.com/elliottophellia/proxylist/main/proxies/http.txt",
+    "https://raw.githubusercontent.com/casa-ls/proxy-list/main/http.txt",
+
+    
+    "https://raw.githubusercontent.com/proxiesmaster/Free-HTTPS-proxies/main/proxy.txt",
     "https://raw.githubusercontent.com/prxchk/proxy-list/main/http.txt",
     "https://raw.githubusercontent.com/saisuiu/Lionkings-Http-Proxys-Lists/main/free.txt",
     "https://raw.githubusercontent.com/Anonym0usWork1221/Free-Proxies/main/proxy_files/http_proxies.txt",
     "https://raw.githubusercontent.com/officialputuid/KangProxy/main/http.txt",
-    "https://raw.githubusercontent.com/HyperBeats/proxy-list/main/http.txt",
-    "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/http.txt",
-    "https://raw.githubusercontent.com/ErcinDedeoglu/proxies/main/proxies/http.txt",
-    "https://raw.githubusercontent.com/mmpx12/proxy-list/master/http.txt",
     "https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/http.txt"
 ]
+
 USER_AGENT_URL = "https://raw.githubusercontent.com/elliotwutingfeng/latest-user-agents/main/latest-user-agents.json"
 PROXY_VALIDATION_TARGET = "https://httpbin.org/get"
 
