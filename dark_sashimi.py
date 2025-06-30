@@ -9,14 +9,14 @@ import time
 
 console = Console()
 
-def semi_auto_main():
+def main():
     console.clear()
     console.print(Panel.fit(
         f"[bold magenta]{config.PROJECT_NAME}[/bold magenta]\n[cyan]{config.CREATOR}[/cyan]\n[bright_yellow]Phiên bản: {config.VERSION}[/bright_yellow]",
         title="🚀 Dark Sashimi", title_align="left")
     )
 
-    # Bắt buộc người dùng nhập URL mục tiêu (không nhập sẽ thoát)
+    # Yêu cầu người dùng nhập URL mục tiêu
     target_url = console.input("[bold yellow]Nhập URL mục tiêu (bao gồm http/https): [/bold yellow]").strip()
     if not target_url:
         console.print("[red]Không có URL, thoát![/red]")
@@ -52,4 +52,4 @@ def semi_auto_main():
     console.print(Panel.fit("[bold green]Chiến dịch đã kết thúc![/bold green]", border_style="green"))
 
 if __name__ == "__main__":
-    semi_auto_main()
+    main()
