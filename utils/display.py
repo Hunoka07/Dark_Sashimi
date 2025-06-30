@@ -135,4 +135,3 @@ def update_threat_intelligence():
         elif total_ok > 100:
             config.attack_stats["threat_intelligence"] = "Tấn công đang diễn ra ổn định. Máy chủ mục tiêu đang chịu áp lực lớn. Tiếp tục duy trì!"
 
-
