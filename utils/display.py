@@ -9,6 +9,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 from rich.align import Align
+from rich.markup import escape
 
 import config
 
@@ -18,21 +19,25 @@ def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def display_main_banner():
-    banner = """
+    banner_text = Text.from_markup("""
 ██████╗  █████╗ ██████╗ ██╗  ██╗    ███████╗  █████╗  ███████╗ ██╗  ██╗ ██╗ ███╗   ██╗
 ██╔══██╗██╔══██╗██╔══██╗██║ ██╔╝    ██╔════╝ ██╔══██╗██╔════╝ ██║  ██║ ██║ ████╗  ██║
 ██║  ██║███████║██████╔╝█████╔╝     ███████╗ ███████║███████╗ ███████║ ██║ ██╔██╗ ██║
 ██║  ██║██╔══██║██╔══██╗██╔═██╗     ╚════██║ ██╔══██║╚════██║ ██╔══██║ ██║ ██║╚██╗██║
 ██████╔╝██║  ██║██║  ██║██║  ██╗    ███████║ ██║  ██║███████║ ██║  ██║ ██║ ██║ ╚████║
 ╚═════╝  ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝    ╚══════╝ ╚═╝  ╚═╝╚══════╝ ╚═╝  ╚═╝ ╚═╝ ╚═╝  ╚═══╝                                                                     
-    """
-    console.print(Text(banner, style="bold #8A2BE2"), justify="center")
-    console.print(Text(f"{config.PROJECT_NAME} v{config.VERSION} - {config.CREATOR}", style="bold cyan"), justify="center")
-    console.rule("[bold #FFD700]Hệ thống Trí tuệ Tác chiến Thế hệ mới[/bold #FFD700]")
+    """, style="bold #8A2BE2", justify="center")
+    
+    project_text = Text(f"{config.PROJECT_NAME} v{config.VERSION} - {config.CREATOR}", style="bold cyan", justify="center")
+    
+    console.print(banner_text)
+    console.print(project_text)
+    console.rule(f"[bold #FFD700]Hệ thống Trí tuệ Tác chiến v{config.VERSION}[/bold #FFD700]")
 
 def display_ai_report(plan):
+    report_text = Text.from_markup(escape(plan["summary_report"]), justify="left")
     report_panel = Panel(
-        Text(plan["summary_report"], justify="left"),
+        report_text,
         title="[bold gold1]Báo cáo từ AI Trợ chiến[/bold gold1]",
         border_style="gold1",
         padding=(1, 2)
@@ -41,10 +46,10 @@ def display_ai_report(plan):
     table = Table(show_header=False, box=None, padding=0)
     table.add_column(style="cyan")
     table.add_column(style="white")
-    table.add_row("Mức độ nguy hiểm:", plan["threat_level"])
-    table.add_row("Vector đề xuất:", f"[bold green]{plan['vector']}[/bold green]")
-    table.add_row("Cường độ đề xuất:", f"[bold green]{plan['mode']}[/bold green]")
-    table.add_row("Số luồng đề xuất:", f"[bold green]{plan['threads']}[/bold green]")
+    table.add_row(Text.from_markup("Mức độ nguy hiểm:"), Text.from_markup(plan["threat_level"]))
+    table.add_row(Text.from_markup("Vector đề xuất:"), Text.from_markup(f"[bold green]{escape(plan['vector'])}[/bold green]"))
+    table.add_row(Text.from_markup("Cường độ đề xuất:"), Text.from_markup(f"[bold green]{escape(plan['mode'])}[/bold green]"))
+    table.add_row(Text.from_markup("Số luồng đề xuất:"), Text.from_markup(f"[bold green]{plan['threads']}[/bold green]"))
     
     console.print(report_panel)
     console.print(table)
@@ -90,17 +95,15 @@ def run_dashboard_loop():
             data_str = f"{data_sent / 1024**2:.2f} MB" if data_sent > 1024**2 else f"{data_sent / 1024:.2f} KB"
             
             stats_table = Table(show_header=False, show_edge=False, box=None)
-            stats_table.add_column(style="cyan", justify="right")
-            stats_table.add_column(style="bold white", justify="left")
-            stats_table.add_row("RPS :", f" {rps:,.1f}")
-            stats_table.add_row("Thành công :", f"[bold {'green' if success_rate > 70 else 'yellow' if success_rate > 30 else 'red'}]{success_rate:.1f}%[/bold]")
-            stats_table.add_row("Luồng :", f" {config.attack_stats['active_threads']}")
-            stats_table.add_row("Dữ liệu :", f" {data_str}")
+            stats_table.add_row(Text("RPS :", style="cyan", justify="right"), Text(f" {rps:,.1f}", style="bold white"))
+            stats_table.add_row(Text("Thành công :", style="cyan", justify="right"), Text.from_markup(f"[bold {'green' if success_rate > 70 else 'yellow' if success_rate > 30 else 'red'}]{success_rate:.1f}%[/bold]"))
+            stats_table.add_row(Text("Luồng :", style="cyan", justify="right"), Text(f" {config.attack_stats['active_threads']}", style="bold white"))
+            stats_table.add_row(Text("Dữ liệu :", style="cyan", justify="right"), Text(f" {data_str}", style="bold white"))
 
             main_panel = Panel(stats_table, title="[b]Hiệu suất Tấn công[/b]", border_style="green")
             
             update_threat_intelligence()
-            intel_panel = Panel(Text(config.attack_stats['threat_intelligence'], style="italic magenta"), title="[b]Tình báo Chiến thuật[/b]", border_style="magenta")
+            intel_panel = Panel(Text.from_markup(escape(config.attack_stats['threat_intelligence'])), title="[b]Tình báo Chiến thuật[/b]", border_style="magenta")
 
             layout["proxy_info"].update(proxy_panel)
             layout["error_info"].update(error_panel)
@@ -115,7 +118,7 @@ def launch_dashboard():
     return dashboard_thread
     
 def update_threat_intelligence():
-    total_req = config.attack_stats["requests_sent"] + config.attack_stats["sockets_opened"]
+    total_req = config.attack_stats["requests_sent"]
     if total_req < 30: 
         config.attack_stats["threat_intelligence"] = "Đang thu thập dữ liệu chiến trường..."
         return
@@ -131,4 +134,3 @@ def update_threat_intelligence():
             config.attack_stats["threat_intelligence"] = "Hệ thống phòng thủ của mục tiêu đang hoạt động rất hiệu quả. Cân nhắc chuyển sang chế độ 'Du kích' để tránh bị phát hiện."
         elif total_ok > 100:
             config.attack_stats["threat_intelligence"] = "Tấn công đang diễn ra ổn định. Máy chủ mục tiêu đang chịu áp lực lớn. Tiếp tục duy trì!"
-
