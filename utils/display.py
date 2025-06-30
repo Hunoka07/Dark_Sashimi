@@ -19,12 +19,12 @@ def clear_screen():
 
 def display_main_banner():
     banner_text = Text.from_markup("""
-██████╗  █████╗ ██████╗ ██╗  ██╗    ███████╗  █████╗  ███████╗ ██╗  ██╗ ██╗ ███╗   ██╗
-██╔══██╗██╔══██╗██╔══██╗██║ ██╔╝    ██╔════╝ ██╔══██╗██╔════╝ ██║  ██║ ██║ ████╗  ██║
-██║  ██║███████║██████╔╝█████╔╝     ███████╗ ███████║███████╗ ███████║ ██║ ██╔██╗ ██║
-██║  ██║██╔══██║██╔══██╗██╔═██╗     ╚════██║ ██╔══██║╚════██║ ██╔══██║ ██║ ██║╚██╗██║
-██████╔╝██║  ██║██║  ██║██║  ██╗    ███████║ ██║  ██║███████║ ██║  ██║ ██║ ██║ ╚████║
-╚═════╝  ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝    ╚══════╝ ╚═╝  ╚═╝╚══════╝ ╚═╝  ╚═╝ ╚═╝ ╚═╝  ╚═══╝                                                                     
+████████╗ ██████╗ ███╗   ██╗██╗   ██╗
+╚══██╔══╝██╔═══██╗████╗  ██║██║   ██║
+   ██║   ██║   ██║██╔██╗ ██║██║   ██║
+   ██║   ██║   ██║██║╚██╗██║██║   ██║
+   ██║   ╚██████╔╝██║ ╚████║╚██████╔╝
+   ╚═╝    ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝ 
     """, style="bold #8A2BE2", justify="center")
     
     project_text = Text(f"{config.PROJECT_NAME} v{config.VERSION} - {config.CREATOR}", style="bold cyan", justify="center")
@@ -74,7 +74,7 @@ def run_dashboard_loop():
     with Live(layout, screen=True, redirect_stderr=False, vertical_overflow="visible", refresh_per_second=5) as live:
         while not config.stop_event.is_set():
             proxy_panel = Panel(
-                Text(f"Tổng: [bold green]{config.attack_stats['proxy_total']:,}[/bold green]\nHoạt động: [bold cyan]{config.attack_stats['proxy_validated']:,}[/bold cyan]", justify="center"), 
+                Text(f"Đã lấy: [bold green]{config.attack_stats['proxy_total']:,}[/bold green]\nHoạt động: [bold cyan]{config.attack_stats['proxy_validated']:,}[/bold cyan]", justify="center"), 
                 title="[b]Proxy[/b]", 
                 border_style="yellow"
             )
@@ -102,7 +102,7 @@ def run_dashboard_loop():
             main_panel = Panel(stats_table, title="[b]Hiệu suất Tấn công[/b]", border_style="green")
             
             update_threat_intelligence()
-            intel_text = Text(config.attack_stats['threat_intelligence'], style="italic magenta")
+            intel_text = Text(config.attack_stats['threat_intelligence'])
             intel_panel = Panel(intel_text, title="[b]Tình báo Chiến thuật[/b]", border_style="magenta")
 
             layout["proxy_info"].update(proxy_panel)
@@ -128,10 +128,22 @@ def update_threat_intelligence():
     
     if total_req > 0:
         err_rate = (total_err / total_req * 100)
-        if err_rate > 95:
-            config.attack_stats["threat_intelligence"] = "Tỉ lệ lỗi cực cao. Proxy gần như bị vô hiệu hóa. Dừng lại và tìm nguồn proxy mới!"
-        elif err_rate > 70:
-            config.attack_stats["threat_intelligence"] = "Hệ thống phòng thủ của mục tiêu đã thích ứng. Cân nhắc dừng lại và chuyển sang chế độ 'Du kích'."
-        elif total_ok > 100:
-            config.attack_stats["threat_intelligence"] = "Tấn công đang diễn ra ổn định. Máy chủ mục tiêu đang chịu áp lực lớn. Tiếp tục duy trì!"
 
+        if not config.proxies:
+            if err_rate > config.ADAPTIVE_ERROR_THRESHOLD and config.adaptive_delay.value < config.ADAPTIVE_MAX_DELAY:
+                config.adaptive_delay.value *= config.ADAPTIVE_BACK_OFF_FACTOR
+                config.attack_stats["threat_intelligence"] = "[AI]: Phát hiện kháng cự! Đang tự động giảm tốc độ để bảo vệ IP."
+            elif err_rate < 10 and config.adaptive_delay.value > config.ADAPTIVE_MIN_DELAY:
+                config.adaptive_delay.value *= config.ADAPTIVE_RAMP_UP_FACTOR
+                config.attack_stats["threat_intelligence"] = "[AI]: Mục tiêu có vẻ ổn định. Đang từ từ tăng áp lực."
+            else:
+                config.attack_stats["threat_intelligence"] = "[AI]: Đang duy trì tốc độ tấn công thích ứng."
+        else:
+            if err_rate > 95:
+                config.attack_stats["threat_intelligence"] = "Tỉ lệ lỗi cực cao. Proxy gần như bị vô hiệu hóa. Dừng lại và tìm nguồn proxy mới!"
+            elif err_rate > 70:
+                config.attack_stats["threat_intelligence"] = "Hệ thống phòng thủ của mục tiêu đã thích ứng. Cân nhắc dừng lại và chuyển sang chế độ 'Du kích'."
+            elif total_ok > 100:
+                config.attack_stats["threat_intelligence"] = "Tấn công đang diễn ra ổn định. Máy chủ mục tiêu đang chịu áp lực lớn. Tiếp tục duy trì!"
+
+              
