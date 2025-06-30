@@ -6,7 +6,7 @@ Một công cụ ddos nguy hiểm sử dụng layer 7, được tích hợp AI �
 
  ⚠️ Tuyên bố Miễn trừ Trách nhiệm
 
-> CẢNH BÁO: Công cụ này được tạo ra với mục đích duy nhất là Tấn Công và Gây Lag trong môi trường được cho phép. Tác giả tuyên bố từ chối mọi trách nhiệm đối với bất kỳ hành vi lạm dụng, phá hoại hoặc thiệt hại nào do công cụ này gây ra.
+> CẢNH BÁO: Công cụ này được tạo ra với mục đích duy nhất là Tấn Công Web trong môi trường được cho phép. Tác giả tuyên bố từ chối mọi trách nhiệm đối với bất kỳ hành vi lạm dụng, phá hoại hoặc thiệt hại nào do công cụ này gây ra.
 >
 > NGƯỜI DÙNG PHẢI CHỊU HOÀN TOÀN TRÁCH NHIỆM PHÁP LÝ CHO MỌI HẬU QUẢ TỪ HÀNH ĐỘNG CỦA MÌNH.
 
