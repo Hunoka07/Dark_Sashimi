@@ -5,25 +5,16 @@ from urllib.parse import urlparse
 import config
 from utils.display import display_main_banner, console, clear_screen, display_ai_report
 from utils.system_check import initial_environment_check
-from utils.network import ProxyManager
 from core.analytics import TargetAnalytics
 from core.ai_analyzer import AIAnalyzer
 from core.attack_manager import AttackManager
+from rich.align import Align
 
 def main():
     try:
         clear_screen()
         display_main_banner()
         initial_environment_check()
-        
-        proxy_manager = ProxyManager()
-        proxy_manager.load_proxies()
-
-        if not config.proxies:
-            proceed = console.input("[bold yellow]Cảnh báo: Không có proxy nào hoạt động. Tấn công sẽ sử dụng IP thật của bạn và kém hiệu quả hơn. Bạn có muốn tiếp tục? (y/N): [/bold yellow]")
-            if proceed.lower() != 'y':
-                console.print("[bold red]Đã hủy chiến dịch theo yêu cầu.[/bold red]")
-                sys.exit(0)
 
         target_url = console.input("[bold gold1]Vui lòng nhập URL Mục tiêu:[/bold gold1] ")
         if not urlparse(target_url).scheme:
@@ -47,7 +38,7 @@ def main():
             threads = ai_plan["threads"]
         else:
             console.print("\n[bold slate_blue1]Vui lòng chọn thủ công:[/bold slate_blue1]")
-            console.print("[bold cyan]1.[/bold cyan] [light_green]HTTP Havoc[/light_green]")
+            console.print("[bold cyan]1.[/bold cyan] [light_green]HTTP Overwhelm[/light_green]")
             console.print("[bold cyan]2.[/bold cyan] [light_green]Slow Pipe[/light_green]")
             vector_choice = console.input("[bold gold1]Lựa chọn Vector [1-2]: [/bold gold1]") or "1"
             
@@ -63,10 +54,10 @@ def main():
 
         clear_screen()
         console.print("\n" + "═"*60)
-        console.print(Align.center(f"[bold gold1]XÁC NHẬN THÔNG TIN CHIẾN DỊCH[/bold gold1]"))
+        console.print(Align.center(Text.from_markup("[bold gold1]XÁC NHẬN THÔNG TIN CHIẾN DỊCH[/bold gold1]")))
         console.print("─"*60)
         console.print(f"[bold white]  Mục tiêu:[/bold white] [cyan]{target_url}[/cyan]")
-        console.print(f"[bold white]  Vector:  [/bold white] [cyan]{'HTTP Havoc' if vector_choice == '1' else 'Slow Pipe'}[/cyan]")
+        console.print(f"[bold white]  Vector:  [/bold white] [cyan]{'HTTP Overwhelm' if vector_choice == '1' else 'Slow Pipe'}[/cyan]")
         console.print(f"[bold white]  Cường độ:[/bold white] [cyan]{attack_mode}[/cyan]")
         console.print(f"[bold white]  Luồng:   [/bold white] [cyan]{threads}[/cyan]")
         console.print("═"*60 + "\n")
@@ -94,3 +85,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
