@@ -5,16 +5,28 @@ from urllib.parse import urlparse
 import config
 from utils.display import display_main_banner, console, clear_screen, display_ai_report
 from utils.system_check import initial_environment_check
+from utils.network import ProxyManager
 from core.analytics import TargetAnalytics
 from core.ai_analyzer import AIAnalyzer
 from core.attack_manager import AttackManager
 from rich.align import Align
+from rich.text import Text
 
 def main():
     try:
         clear_screen()
         display_main_banner()
         initial_environment_check()
+        
+        proxy_manager = ProxyManager()
+        proxy_manager.load_proxies()
+
+        if not config.proxies:
+            proceed = console.input("[bold yellow]Cảnh báo: Không có proxy nào hoạt động. AI sẽ kích hoạt chế độ Tấn công Thích ứng để bảo vệ IP của bạn. Bạn có muốn tiếp tục? (y/N): [/bold yellow]")
+            if proceed.lower() != 'y':
+                console.print("[bold red]Đã hủy chiến dịch theo yêu cầu.[/bold red]")
+                sys.exit(0)
+            config.ADAPTIVE_MODE_ENABLED = True
 
         target_url = console.input("[bold gold1]Vui lòng nhập URL Mục tiêu:[/bold gold1] ")
         if not urlparse(target_url).scheme:
@@ -60,6 +72,8 @@ def main():
         console.print(f"[bold white]  Vector:  [/bold white] [cyan]{'HTTP Overwhelm' if vector_choice == '1' else 'Slow Pipe'}[/cyan]")
         console.print(f"[bold white]  Cường độ:[/bold white] [cyan]{attack_mode}[/cyan]")
         console.print(f"[bold white]  Luồng:   [/bold white] [cyan]{threads}[/cyan]")
+        if config.ADAPTIVE_MODE_ENABLED:
+            console.print(f"[bold yellow]  Chế độ:  [/bold yellow] [bold red]AI Tấn công Thích ứng ĐANG BẬT[/bold red]")
         console.print("═"*60 + "\n")
         
         console.input("[bold blink red]NHẤN ENTER ĐỂ BẮT ĐẦU CHIẾN DỊCH...[/bold blink red]")
