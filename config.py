@@ -21,7 +21,11 @@ PROXY_SOURCES = [
     "https://raw.githubusercontent.com/saisuiu/Lionkings-Http-Proxys-Lists/main/free.txt",
     "https://raw.githubusercontent.com/Anonym0usWork1221/Free-Proxies/main/proxy_files/http_proxies.txt",
     "https://raw.githubusercontent.com/officialputuid/KangProxy/main/http.txt",
-    "https://raw.githubusercontent.com/HyperBeats/proxy-list/main/http.txt"
+    "https://raw.githubusercontent.com/HyperBeats/proxy-list/main/http.txt",
+    "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/http.txt",
+    "https://raw.githubusercontent.com/ErcinDedeoglu/proxies/main/proxies/http.txt",
+    "https://raw.githubusercontent.com/mmpx12/proxy-list/master/http.txt",
+    "https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/http.txt"
 ]
 USER_AGENT_URL = "https://raw.githubusercontent.com/elliotwutingfeng/latest-user-agents/main/latest-user-agents.json"
 PROXY_VALIDATION_TARGET = "https://httpbin.org/get"
@@ -35,4 +39,3 @@ attack_stats = {
 stop_event = threading.Event()
 proxies = []
 user_agents = []
-
