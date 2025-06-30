@@ -21,6 +21,7 @@ def main():
         
         proxy_manager = ProxyManager()
         proxy_manager.load_proxies()
+
         if not config.proxies:
             proceed = console.input("[bold yellow]Cảnh báo: Không có proxy nào hoạt động. Tấn công sẽ sử dụng IP thật của bạn và kém hiệu quả hơn. Bạn có muốn tiếp tục? (y/N): [/bold yellow]")
             if proceed.lower() != 'y':
@@ -32,12 +33,13 @@ def main():
             target_url = "https://" + target_url
 
         analytics = TargetAnalytics(target_url)
-        target_info = analytics.run_analysis()
+        target_info, response_obj = analytics.run_analysis()
+
         if not target_info:
              console.print("[bold red]LỖI: Không thể phân tích mục tiêu. Đang thoát.[/bold red]")
              sys.exit(1)
         
-        ai_analyzer = AIAnalyzer(target_info)
+        ai_analyzer = AIAnalyzer(target_info, response_obj)
         ai_plan = ai_analyzer.generate_plan()
         display_ai_report(ai_plan)
 
