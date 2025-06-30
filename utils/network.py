@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import requests
 import random
 import asyncio
@@ -28,13 +27,15 @@ class ProxyManager:
         config.attack_stats["proxy_total"] = len(self.raw_proxies)
 
     async def validate_proxy(self, session, proxy):
-        try:
-            proxy_url = f"http://{proxy}"
-            async with session.get(config.PROXY_VALIDATION_TARGET, proxy=proxy_url, timeout=config.PROXY_TIMEOUT) as response:
-                if response.status == 200:
-                    return proxy
-        except (aiohttp.ClientError, asyncio.TimeoutError):
-            pass
+        validation_targets = [config.PROXY_VALIDATION_TARGET, "https://api.ipify.org/"]
+        proxy_url = f"http://{proxy}"
+        for target in validation_targets:
+            try:
+                async with session.get(target, proxy=proxy_url, timeout=config.PROXY_TIMEOUT) as response:
+                    if response.status == 200:
+                        return proxy
+            except (aiohttp.ClientError, asyncio.TimeoutError):
+                continue
         return None
 
     async def run_validation(self):
