@@ -3,6 +3,7 @@
 PROJECT_NAME = 'Tonu Project'
 VERSION = '1.0.0'
 CREATOR = 'System Developer'
+REQUIRED_PYTHON_VERSION = (3, 8)
 
 SECRET_KEY = 'secret-key-that-must-be-changed'
 DEBUG = False
