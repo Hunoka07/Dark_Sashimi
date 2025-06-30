@@ -24,25 +24,35 @@ class AIAnalyzer:
         headers = {k.lower(): v for k, v in self.response.headers.items()}
         content = self.response.text.lower()
         
+        # Phân tích Cloudflare
         if headers.get("server") == "cloudflare" or "cf-ray" in headers:
             self.plan["threat_level"] = "[bold yellow]Trung bình[/bold yellow]"
-            self.plan["summary_report"] = "Phát hiện Cloudflare. AI đề xuất tấn công 'Du kích' để tránh kích hoạt cơ chế chống bot và thăm dò phản ứng của hệ thống phòng thủ."
-            self.plan["mode"] = "Guerilla"
-            self.plan["threads"] = config.DEFAULT_THREADS["Guerilla"]
-        elif "sucuri" in headers.get("x-sucuri-id", ""):
+            if "cf-mitigated" in headers or "challenge" in content:
+                 self.plan["summary_report"] = "Phát hiện Cloudflare đang hoạt động ở chế độ 'Under Attack'. AI đề xuất tấn công bằng 'Slow Pipe' để tránh bị chặn và làm cạn kiệt tài nguyên của họ."
+                 self.plan["vector"] = "Slow Pipe"
+                 self.plan["vector_id"] = "2"
+                 self.plan["mode"] = "Saturation"
+            else:
+                self.plan["summary_report"] = "Phát hiện Cloudflare. AI đề xuất tấn công 'Du kích' để tránh kích hoạt cơ chế chống bot và thăm dò phản ứng của hệ thống phòng thủ."
+                self.plan["mode"] = "Guerilla"
+            self.plan["threads"] = config.DEFAULT_THREADS[self.plan["mode"]]
+            return
+
+        # Phân tích Sucuri
+        if "sucuri" in headers.get("x-sucuri-id", ""):
             self.plan["threat_level"] = "[bold orange3]Cao[/bold orange3]"
             self.plan["summary_report"] = "Phát hiện lớp bảo vệ Sucuri. Đề xuất tấn công 'Hủy diệt' với số luồng cực lớn để thử vượt qua bộ đệm cache và giới hạn tốc độ của họ."
             self.plan["mode"] = "Annihilation"
             self.plan["threads"] = config.DEFAULT_THREADS["Annihilation"]
-        elif "aws" in headers.get("server", "") or "x-amz-cf-id" in headers:
-            self.plan["threat_level"] = "[bold yellow]Trung bình[/bold yellow]"
-            self.plan["summary_report"] = "Hệ thống có vẻ đang sử dụng AWS WAF/CloudFront. Cần tấn công một cách thông minh. Đề xuất chế độ 'Bão hòa' để tạo áp lực vừa đủ."
+            return
+
+        # Phân tích WordPress
+        if re.search(r'<meta name="generator" content="WordPress', content, re.IGNORECASE):
+            self.plan["threat_level"] = "[green]Thấp-Trung bình[/green]"
+            self.plan["summary_report"] = "Phát hiện website WordPress. Các trang này thường dễ bị tấn công vào file xmlrpc.php hoặc wp-login.php. AI khuyến nghị một cuộc tấn công 'Bão hòa' tổng lực trước."
             self.plan["mode"] = "Saturation"
             self.plan["threads"] = config.DEFAULT_THREADS["Saturation"]
-        elif re.search(r'<meta name="generator" content="WordPress', content, re.IGNORECASE):
-            self.plan["threat_level"] = "[green]Thấp-Trung bình[/green]"
-            self.plan["summary_report"] = "Phát hiện website WordPress. Các trang này thường dễ bị tấn công vào file xmlrpc.php hoặc wp-login.php. Tuy nhiên, AI khuyến nghị một cuộc tấn công 'Bão hòa' tổng lực trước."
-            self.plan["mode"] = "Saturation"
+            return
 
     def analyze_latency(self):
         try:
@@ -57,5 +67,4 @@ class AIAnalyzer:
                 self.plan["threads"] = int(config.DEFAULT_THREADS["Saturation"] / 2)
         except (ValueError, IndexError):
             pass
-
 
