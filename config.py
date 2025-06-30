@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+PROJECT_NAME = 'Tonu Project'
+VERSION = '1.0.0'
+
 SECRET_KEY = 'secret-key-that-must-be-changed'
 DEBUG = False
 TESTING = False
@@ -24,4 +27,3 @@ MAIL_DEFAULT_SENDER = None
 ITEMS_PER_PAGE = 25
 DEFAULT_LANGUAGE = 'vi'
 SUPPORTED_LANGUAGES = ['en', 'vi']
-
