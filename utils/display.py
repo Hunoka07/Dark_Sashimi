@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import threading
 import time
 import os
@@ -60,17 +59,11 @@ def make_layout():
         Layout(name="footer", size=3)
     )
     layout["main"].split_row(
-        Layout(name="left_side"),
+        Layout(name="left_side", minimum_size=30),
         Layout(name="right_side", ratio=2),
     )
-    layout["left_side"].split(
-        Layout(name="proxy_info"),
-        Layout(name="error_info")
-    )
-    layout["right_side"].split(
-        Layout(name="attack_stats"),
-        Layout(name="intel_report")
-    )
+    layout["left_side"].split(Layout(name="proxy_info"), Layout(name="error_info"))
+    layout["right_side"].split(Layout(name="attack_stats"), Layout(name="intel_report"))
     return layout
 
 def run_dashboard_loop():
@@ -91,30 +84,26 @@ def run_dashboard_loop():
                 border_style="red"
             )
 
-            elapsed = max(time.time() - config.attack_stats["start_time"], 1)
+            elapsed = max(time.time() - config.attack_stats.get("start_time", time.time()), 1)
             rps = config.attack_stats["requests_sent"] / elapsed
             total_ok = config.attack_stats["http_ok"]
             total_err = config.attack_stats["http_error"] + config.attack_stats["connect_error"] + config.attack_stats["timeout_error"]
             total_req = total_ok + total_err
             success_rate = (total_ok / total_req * 100) if total_req > 0 else 100
-            data_sent = config.attack_stats["bytes_sent"]
-            data_str = f"{data_sent / 1024**2:.2f} MB" if data_sent > 1024**2 else f"{data_sent / 1024:.2f} KB"
             
-            # === ĐÂY LÀ PHẦN SỬA LỖI QUAN TRỌNG NHẤT ===
             success_rate_color = "green" if success_rate > 70 else "yellow" if success_rate > 30 else "red"
             success_rate_text = Text(f"{success_rate:.1f}%", style=f"bold {success_rate_color}")
-            # ============================================
-
+            
             stats_table = Table(show_header=False, show_edge=False, box=None)
             stats_table.add_row(Text("RPS :", style="cyan", justify="right"), Text(f" {rps:,.1f}", style="bold white"))
             stats_table.add_row(Text("Thành công :", style="cyan", justify="right"), success_rate_text)
             stats_table.add_row(Text("Luồng :", style="cyan", justify="right"), Text(f" {config.attack_stats['active_threads']}", style="bold white"))
-            stats_table.add_row(Text("Dữ liệu :", style="cyan", justify="right"), Text(f" {data_str}", style="bold white"))
 
             main_panel = Panel(stats_table, title="[b]Hiệu suất Tấn công[/b]", border_style="green")
             
             update_threat_intelligence()
-            intel_panel = Panel(Text(config.attack_stats['threat_intelligence']), title="[b]Tình báo Chiến thuật[/b]", border_style="magenta")
+            intel_text = Text(config.attack_stats['threat_intelligence'], style="italic magenta")
+            intel_panel = Panel(intel_text, title="[b]Tình báo Chiến thuật[/b]", border_style="magenta")
 
             layout["proxy_info"].update(proxy_panel)
             layout["error_info"].update(error_panel)
@@ -130,7 +119,7 @@ def launch_dashboard():
     
 def update_threat_intelligence():
     total_req = config.attack_stats["requests_sent"]
-    if total_req < 30: 
+    if total_req < 50: 
         config.attack_stats["threat_intelligence"] = "Đang thu thập dữ liệu chiến trường..."
         return
     
@@ -140,9 +129,10 @@ def update_threat_intelligence():
     if total_req > 0:
         err_rate = (total_err / total_req * 100)
         if err_rate > 95:
-            config.attack_stats["threat_intelligence"] = "Tỉ lệ lỗi cực cao. Các proxy gần như bị vô hiệu hóa. Hãy tìm nguồn proxy mới hoặc dừng chiến dịch."
+            config.attack_stats["threat_intelligence"] = "Tỉ lệ lỗi cực cao. Proxy gần như bị vô hiệu hóa. Dừng lại và tìm nguồn proxy mới!"
         elif err_rate > 70:
-            config.attack_stats["threat_intelligence"] = "Hệ thống phòng thủ của mục tiêu đang hoạt động rất hiệu quả. Cân nhắc chuyển sang chế độ 'Du kích' để tránh bị phát hiện."
+            config.attack_stats["threat_intelligence"] = "Hệ thống phòng thủ của mục tiêu đã thích ứng. Cân nhắc dừng lại và chuyển sang chế độ 'Du kích'."
         elif total_ok > 100:
             config.attack_stats["threat_intelligence"] = "Tấn công đang diễn ra ổn định. Máy chủ mục tiêu đang chịu áp lực lớn. Tiếp tục duy trì!"
+
 
