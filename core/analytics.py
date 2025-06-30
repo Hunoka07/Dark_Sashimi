@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import time
 from urllib.parse import urlparse
 import cloudscraper
@@ -11,62 +12,55 @@ class TargetAnalytics:
         self.domain = urlparse(self.url).netloc
         self.results = {}
         self.scraper = cloudscraper.create_scraper()
+        self.response_obj = None
 
     def run_analysis(self):
-        with console.status(f"[bold magenta]Analyzing target: {self.domain}...[/bold magenta]"):
-            self.results['Target'] = self.domain
+        with console.status(f"[bold magenta]Đang do thám mục tiêu: {self.domain}...[/bold magenta]"):
+            self.results['Mục tiêu'] = self.domain
             self.check_reachability_and_headers()
         
-        if self.results.get("Status") == "Unreachable":
+        if self.results.get("Trạng thái") == "[red]Không thể truy cập[/red]":
             self.display_report()
-            return None
+            return None, None
             
         self.measure_latency()
         self.display_report()
-        return self.results
+        return self.results, self.response_obj
 
     def check_reachability_and_headers(self):
         try:
-            response = self.scraper.get(self.url, timeout=10)
-            self.results['Status'] = f"{response.status_code} {response.reason}"
-            headers = {k.lower(): v for k, v in response.headers.items()}
-            server = headers.get('server', 'N/A').lower()
-
-            if 'cloudflare' in server: self.results['Protection'] = "Cloudflare"
-            elif 'sucuri' in server: self.results['Protection'] = "Sucuri CloudProxy"
-            elif any(k in headers for k in ['x-amz-cf-id', 'x-aws-waf-token']): self.results['Protection'] = "AWS WAF/CloudFront"
-            else: self.results['Protection'] = "Unknown/None"
-
-            self.results['Server'] = server.capitalize()
-            self.results['Content-Type'] = headers.get('content-type', 'N/A')
+            self.response_obj = self.scraper.get(self.url, timeout=10)
+            self.results['Trạng thái'] = f"[green]{self.response_obj.status_code} {self.response_obj.reason}[/green]"
+            headers = {k.lower(): v for k, v in self.response_obj.headers.items()}
+            self.results['Máy chủ'] = headers.get('server', 'Không rõ').lower()
             
-        except requests.exceptions.RequestException as e:
-            self.results['Status'] = "Unreachable"
-            self.results['Error'] = str(type(e).__name__)
+        except Exception as e:
+            self.results['Trạng thái'] = "[red]Không thể truy cập[/red]"
+            self.results['Lỗi'] = str(type(e).__name__)
 
     def measure_latency(self):
         timings = []
-        with console.status(f"[bold magenta]Measuring network latency...[/bold magenta]"):
+        with console.status(f"[bold magenta]Đo lường độ trễ mạng...[/bold magenta]"):
             for _ in range(3):
                 try:
-                    start = time.time()
+                    start_time = time.perf_counter()
                     self.scraper.head(self.url, timeout=5)
-                    end = time.time()
-                    timings.append((end - start) * 1000)
-                except requests.exceptions.RequestException:
-                    timings.append(float('inf'))
+                    end_time = time.perf_counter()
+                    timings.append((end_time - start_time) * 1000)
+                except Exception:
+                    continue
         
-        if all(t == float('inf') for t in timings):
-            self.results['Avg. Latency'] = "Timeout"
+        if not timings:
+            self.results['Độ trễ TB'] = "[red]Timeout[/red]"
         else:
-            valid_timings = [t for t in timings if t != float('inf')]
-            avg_latency = sum(valid_timings) / len(valid_timings)
-            self.results['Avg. Latency'] = f"{avg_latency:.2f} ms"
+            avg_latency = sum(timings) / len(timings)
+            self.results['Độ trễ TB'] = f"{avg_latency:.2f} ms"
 
     def display_report(self):
-        table = Table(title=f"Target Analysis: {self.domain}", style="magenta", title_style="bold magenta", border_style="blue")
-        table.add_column("Parameter", style="cyan", no_wrap=True)
-        table.add_column("Finding", style="white")
+        table = Table(title=f"Báo cáo Do thám: {self.domain}", style="magenta", title_style="bold magenta", border_style="blue")
+        table.add_column("Tham số", style="cyan", no_wrap=True)
+        table.add_column("Kết quả", style="white")
         for key, value in self.results.items():
             table.add_row(key, str(value))
         console.print(table)
+
