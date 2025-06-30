@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import sys
 import time
 from urllib.parse import urlparse
@@ -66,7 +63,7 @@ def main():
 
         clear_screen()
         console.print("\n" + "═"*60)
-        console.print(f"[bold gold1]  XÁC NHẬN THÔNG TIN CHIẾN DỊCH[/bold gold1]")
+        console.print(Align.center(f"[bold gold1]XÁC NHẬN THÔNG TIN CHIẾN DỊCH[/bold gold1]"))
         console.print("─"*60)
         console.print(f"[bold white]  Mục tiêu:[/bold white] [cyan]{target_url}[/cyan]")
         console.print(f"[bold white]  Vector:  [/bold white] [cyan]{'HTTP Matrix' if vector_choice == '1' else 'Slow Pipe'}[/cyan]")
