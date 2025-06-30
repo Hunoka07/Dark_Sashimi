@@ -73,4 +73,3 @@ class SlowPipe(threading.Thread):
                 time.sleep(1)
 
         config.attack_stats["active_threads"] -= 1
-
