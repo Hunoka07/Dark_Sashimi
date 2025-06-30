@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import re
 import config
 
@@ -11,60 +10,130 @@ class AIAnalyzer:
             "vector_id": "1",
             "mode": "Saturation",
             "threads": config.DEFAULT_THREADS["Saturation"],
-            "threat_level": "[green]Thấp[/green]",
-            "summary_report": "Mục tiêu không có lớp bảo vệ rõ ràng. Một cuộc tấn công bão hòa tiêu chuẩn được khuyến nghị."
+            "threat_level": "Thấp",
+            "summary_report": "Không phát hiện lớp bảo vệ đặc biệt. Đề xuất tấn công bão hòa tiêu chuẩn."
         }
 
     def generate_plan(self):
         self.analyze_protection()
         self.analyze_latency()
+        self.analyze_content()
         return self.plan
 
     def analyze_protection(self):
-        headers = {k.lower(): v for k, v in self.response.headers.items()}
-        content = self.response.text.lower()
-        
-        # Phân tích Cloudflare
-        if headers.get("server") == "cloudflare" or "cf-ray" in headers:
-            self.plan["threat_level"] = "[bold yellow]Trung bình[/bold yellow]"
-            if "cf-mitigated" in headers or "challenge" in content:
-                 self.plan["summary_report"] = "Phát hiện Cloudflare đang hoạt động ở chế độ 'Under Attack'. AI đề xuất tấn công bằng 'Slow Pipe' để tránh bị chặn và làm cạn kiệt tài nguyên của họ."
-                 self.plan["vector"] = "Slow Pipe"
-                 self.plan["vector_id"] = "2"
-                 self.plan["mode"] = "Saturation"
+        headers = {k.lower(): v for k, v in getattr(self.response, "headers", {}).items()}
+        content = getattr(self.response, "text", "").lower()
+
+        if "cloudflare" in headers.get("server", "") or "cf-ray" in headers or "cloudflare" in content:
+            self.plan["threat_level"] = "Trung bình"
+            if any(k in headers for k in ["cf-mitigated", "cf-chl-bypass"]):
+                self.plan["vector"] = "Slow Pipe"
+                self.plan["vector_id"] = "2"
+                self.plan["mode"] = "Saturation"
+                self.plan["summary_report"] = "Cloudflare bật chế độ bảo vệ cao. Đề xuất Slow Pipe để vượt thử thách/challenge."
             else:
-                self.plan["summary_report"] = "Phát hiện Cloudflare. AI đề xuất tấn công 'Du kích' để tránh kích hoạt cơ chế chống bot và thăm dò phản ứng của hệ thống phòng thủ."
+                self.plan["vector"] = "HTTP Matrix"
+                self.plan["vector_id"] = "1"
                 self.plan["mode"] = "Guerilla"
+                self.plan["summary_report"] = "Phát hiện Cloudflare. Đề xuất tấn công nhanh, rải rác để tránh bị block."
             self.plan["threads"] = config.DEFAULT_THREADS[self.plan["mode"]]
             return
 
-        # Phân tích Sucuri
-        if "sucuri" in headers.get("x-sucuri-id", ""):
-            self.plan["threat_level"] = "[bold orange3]Cao[/bold orange3]"
-            self.plan["summary_report"] = "Phát hiện lớp bảo vệ Sucuri. Đề xuất tấn công 'Hủy diệt' với số luồng cực lớn để thử vượt qua bộ đệm cache và giới hạn tốc độ của họ."
+        if "sucuri" in headers.get("x-sucuri-id", "") or "sucuri" in headers.get("server", "") or "sucuri" in content:
+            self.plan["threat_level"] = "Cao"
+            self.plan["vector"] = "Annihilation"
+            self.plan["vector_id"] = "3"
             self.plan["mode"] = "Annihilation"
             self.plan["threads"] = config.DEFAULT_THREADS["Annihilation"]
+            self.plan["summary_report"] = "Phát hiện Sucuri. Đề xuất tăng số luồng tối đa để vượt cache và lọc."
             return
 
-        # Phân tích WordPress
-        if re.search(r'<meta name="generator" content="WordPress', content, re.IGNORECASE):
-            self.plan["threat_level"] = "[green]Thấp-Trung bình[/green]"
-            self.plan["summary_report"] = "Phát hiện website WordPress. Các trang này thường dễ bị tấn công vào file xmlrpc.php hoặc wp-login.php. AI khuyến nghị một cuộc tấn công 'Bão hòa' tổng lực trước."
+        if "ddos-guard" in headers.get("server", "") or "ddos-guard" in content:
+            self.plan["threat_level"] = "Cao"
+            self.plan["vector"] = "Slow Pipe"
+            self.plan["vector_id"] = "2"
             self.plan["mode"] = "Saturation"
             self.plan["threads"] = config.DEFAULT_THREADS["Saturation"]
+            self.plan["summary_report"] = "DDoS-Guard phát hiện. Đề xuất Slow Pipe để né bot-filter, giảm tỉ lệ block cứng."
+            return
+
+        if "akamai" in headers.get("server", "") or "akamai" in content:
+            self.plan["threat_level"] = "Cao"
+            self.plan["vector"] = "HTTP Matrix"
+            self.plan["vector_id"] = "1"
+            self.plan["mode"] = "Saturation"
+            self.plan["threads"] = config.DEFAULT_THREADS["Saturation"]
+            self.plan["summary_report"] = "Akamai phát hiện. Đề xuất HTTP Matrix, kết hợp fake header và proxy mạnh."
+            return
+
+        if "f5" in headers.get("server", "").lower() or "big-ip" in content:
+            self.plan["threat_level"] = "Cao"
+            self.plan["vector"] = "HTTP Matrix"
+            self.plan["vector_id"] = "1"
+            self.plan["mode"] = "Saturation"
+            self.plan["threads"] = config.DEFAULT_THREADS["Saturation"]
+            self.plan["summary_report"] = "F5/BIG-IP phát hiện. Đề xuất HTTP Matrix với proxy tốt và luồng lớn."
+            return
+
+        if "wordfence" in content or "waf" in headers.get("server", "") or "waf" in headers.get("x-powered-by", ""):
+            self.plan["threat_level"] = "Trung bình"
+            self.plan["vector"] = "Slow Pipe"
+            self.plan["vector_id"] = "2"
+            self.plan["mode"] = "Guerilla"
+            self.plan["threads"] = config.DEFAULT_THREADS["Guerilla"]
+            self.plan["summary_report"] = "Phát hiện Wordfence/WAF. Đề xuất Slow Pipe, tránh block nhanh."
+            return
+
+        if "cdn" in headers.get("server", "") or "cdn" in content:
+            self.plan["threat_level"] = "Thấp-Trung bình"
+            self.plan["vector"] = "HTTP Matrix"
+            self.plan["vector_id"] = "1"
+            self.plan["mode"] = "Guerilla"
+            self.plan["threads"] = config.DEFAULT_THREADS["Guerilla"]
+            self.plan["summary_report"] = "Có CDN. Đề xuất tấn công rải rác, tránh tăng traffic đột ngột."
             return
 
     def analyze_latency(self):
         try:
-            latency_str = self.target_info.get("Độ trễ TB", "0 ms").split()[0]
+            latency_str = str(self.target_info.get("Độ trễ TB", "0 ms")).split()[0]
             latency = float(latency_str)
-            if latency > 600:
-                self.plan["threat_level"] = "[bold red]Rất cao[/bold red]"
+            if latency > 800:
+                self.plan["threat_level"] = "Rất cao"
                 self.plan["vector"] = "Slow Pipe"
                 self.plan["vector_id"] = "2"
-                self.plan["summary_report"] = "Độ trễ của mục tiêu rất cao, cho thấy máy chủ đã quá tải hoặc ở xa. Vector 'Slow Pipe' sẽ cực kỳ hiệu quả để làm cạn kiệt tài nguyên kết nối còn lại của nó."
                 self.plan["mode"] = "Saturation"
                 self.plan["threads"] = int(config.DEFAULT_THREADS["Saturation"] / 2)
-        except (ValueError, IndexError):
+                self.plan["summary_report"] = "Độ trễ cực cao, máy chủ có thể quá tải hoặc đã bị rate-limit. Slow Pipe cực kỳ hiệu quả."
+        except Exception:
             pass
 
+    def analyze_content(self):
+        content = getattr(self.response, "text", "").lower()
+        url = getattr(self.response, "url", "")
+
+        if re.search(r'<meta name="generator" content="wordpress', content):
+            self.plan["threat_level"] = "Thấp-Trung bình"
+            self.plan["vector"] = "HTTP Matrix"
+            self.plan["vector_id"] = "1"
+            self.plan["mode"] = "Saturation"
+            self.plan["threads"] = config.DEFAULT_THREADS["Saturation"]
+            self.plan["summary_report"] = "Website WordPress. Đề xuất HTTP Matrix tập trung vào xmlrpc.php và wp-login.php."
+            return
+
+        if "/api/" in url or "/api/" in content:
+            self.plan["threat_level"] = "Trung bình-Cao"
+            self.plan["vector"] = "Slow Pipe"
+            self.plan["vector_id"] = "2"
+            self.plan["mode"] = "Saturation"
+            self.plan["threads"] = config.DEFAULT_THREADS["Saturation"]
+            self.plan["summary_report"] = "Đích đến là API. Slow Pipe giúp tăng tải mà khó bị phát hiện."
+            return
+
+        if "login" in url or "login" in content:
+            self.plan["threat_level"] = "Trung bình"
+            self.plan["vector"] = "Annihilation"
+            self.plan["vector_id"] = "3"
+            self.plan["mode"] = "Annihilation"
+            self.plan["threads"] = config.DEFAULT_THREADS["Annihilation"]
+            self.plan["summary_report"] = "Phát hiện trang đăng nhập. Đề xuất Annihilation để ép tài nguyên xác thực."
+            return
