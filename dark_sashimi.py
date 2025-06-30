@@ -3,7 +3,7 @@ from rich.panel import Panel
 from core.analytics import TargetAnalytics
 from core.ai_analyzer import AIAnalyzer
 from core.attack_manager import AttackManager
-from network import ProxyManager, fetch_user_agents
+from utils.network import ProxyManager, fetch_user_agents
 import config
 import time
 
