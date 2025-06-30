@@ -1,4 +1,4 @@
- Dark Sashimi X
+Tonu
 
 Một công cụ ddos nguy hiểm sử dụng layer 7, được tích hợp AI để giúp phân tích và đưa ra phương hướng tấn công.
 
@@ -10,23 +10,9 @@ Một công cụ ddos nguy hiểm sử dụng layer 7, được tích hợp AI �
 >
 > NGƯỜI DÙNG PHẢI CHỊU HOÀN TOÀN TRÁCH NHIỆM PHÁP LÝ CHO MỌI HẬU QUẢ TỪ HÀNH ĐỘNG CỦA MÌNH.
 
- ✨ Tính năng nổi bật
-
- 🧠 AI Trợ chiến: Tự động phân tích sâu mục tiêu (WAF, cookies, nội dung HTML) để đưa ra kế hoạch tấn công tối ưu.
-
- ⚔️ Vector Hủy diệt: Tích hợp các vector tấn công L7 mạnh mẽ như HTTP Havoc (tấn công ma trận) và Slow Pipe (làm cạn kiệt kết nối).
-
- 📊 Dashboard Chỉ huy: Theo dõi chiến dịch trong thời gian thực với giao diện trực quan, hiển thị các thông số cốt lõi.
- 
- 🌐 Hệ thống Proxy Bất tử: Tự động lấy và kiểm tra proxy từ hơn 20 nguồn uy tín nhất, với cơ chế kiểm tra dự phòng để đảm bảo tỉ lệ thành công cao.(is having an error)
- 
- 📱 Hoạt động không cần Root: Được thiết kế để hoạt động mạnh mẽ trên các thiết bị Android tiêu chuẩn mà không yêu cầu quyền root.
-
- 🇻🇳 Giao diện Tiếng Việt: Toàn bộ giao diện được Việt hóa, thân thiện và dễ sử dụng.
-
  🚀 Hướng dẫn Cài đặt & Triển khai
 
-Để cài đặt và chạy Dark Sashimi X, hãy làm theo chính xác các bước dưới đây.
+Để cài đặt và chạy Tonu, hãy làm theo chính xác các bước dưới đây.
 
  Bước 1: Cài đặt Termux từ F-Droid
 Nền tảng Termux trên Google Play đã cũ và không còn được hỗ trợ. Để đảm bảo công cụ hoạt động ổn định, bạn phải cài đặt Termux từ F-Droid.
