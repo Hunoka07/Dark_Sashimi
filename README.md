@@ -1,22 +1,27 @@
  Dark Sashimi X
 
-Một công cụ kiểm tra hiệu năng Layer 7 thế hệ mới, được tích hợp AI Trợ chiến để phân tích và đề xuất các kế hoạch tác chiến thông minh.
+Một công cụ ddos nguy hiểm sử dụng layer 7, được tích hợp AI để giúp phân tích và đưa ra phương hướng tấn công.
 
 ![Dòng kẻ phân cách](https://i.imgur.com/s657A42.png)
 
  ⚠️ Tuyên bố Miễn trừ Trách nhiệm
 
-> CẢNH BÁO: Công cụ này được tạo ra với mục đích duy nhất là GIÁO DỤC và NGHIÊN CỨU BẢO MẬT trong môi trường được cho phép. Tác giả tuyên bố từ chối mọi trách nhiệm đối với bất kỳ hành vi lạm dụng, phá hoại hoặc thiệt hại nào do công cụ này gây ra.
+> CẢNH BÁO: Công cụ này được tạo ra với mục đích duy nhất là Tấn Công và Gây Lag trong môi trường được cho phép. Tác giả tuyên bố từ chối mọi trách nhiệm đối với bất kỳ hành vi lạm dụng, phá hoại hoặc thiệt hại nào do công cụ này gây ra.
 >
 > NGƯỜI DÙNG PHẢI CHỊU HOÀN TOÀN TRÁCH NHIỆM PHÁP LÝ CHO MỌI HẬU QUẢ TỪ HÀNH ĐỘNG CỦA MÌNH.
 
  ✨ Tính năng nổi bật
 
  🧠 AI Trợ chiến: Tự động phân tích sâu mục tiêu (WAF, cookies, nội dung HTML) để đưa ra kế hoạch tấn công tối ưu.
+
  ⚔️ Vector Hủy diệt: Tích hợp các vector tấn công L7 mạnh mẽ như HTTP Havoc (tấn công ma trận) và Slow Pipe (làm cạn kiệt kết nối).
+
  📊 Dashboard Chỉ huy: Theo dõi chiến dịch trong thời gian thực với giao diện trực quan, hiển thị các thông số cốt lõi.
- 🌐 Hệ thống Proxy Bất tử: Tự động lấy và kiểm tra proxy từ hơn 20 nguồn uy tín nhất, với cơ chế kiểm tra dự phòng để đảm bảo tỉ lệ thành công cao.
+ 
+ 🌐 Hệ thống Proxy Bất tử: Tự động lấy và kiểm tra proxy từ hơn 20 nguồn uy tín nhất, với cơ chế kiểm tra dự phòng để đảm bảo tỉ lệ thành công cao.(is having an error)
+ 
  📱 Hoạt động không cần Root: Được thiết kế để hoạt động mạnh mẽ trên các thiết bị Android tiêu chuẩn mà không yêu cầu quyền root.
+
  🇻🇳 Giao diện Tiếng Việt: Toàn bộ giao diện được Việt hóa, thân thiện và dễ sử dụng.
 
  🚀 Hướng dẫn Cài đặt & Triển khai
