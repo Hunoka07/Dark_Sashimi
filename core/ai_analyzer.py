@@ -6,10 +6,8 @@ class AIAnalyzer:
         self.target_info = target_info
         self.response = response_obj
         self.plan = {
-            "vector": "HTTP Havoc",
-            "vector_id": "1",
-            "mode": "Saturation",
-            "threads": config.DEFAULT_THREADS["Saturation"],
+            "vector": "HTTP Overwhelm", "vector_id": "1",
+            "mode": "Saturation", "threads": config.DEFAULT_THREADS["Saturation"],
             "threat_level": "[green]Thấp[/green]",
             "summary_report": "Mục tiêu không có lớp bảo vệ rõ ràng. Một cuộc tấn công bão hòa tiêu chuẩn được khuyến nghị."
         }
@@ -20,9 +18,7 @@ class AIAnalyzer:
         return self.plan
 
     def analyze_protection(self):
-        if not self.response:
-            return
-
+        if not self.response: return
         headers = {k.lower(): v for k, v in self.response.headers.items()}
         content = self.response.text.lower()
         
@@ -61,4 +57,3 @@ class AIAnalyzer:
                 self.plan["threads"] = int(config.DEFAULT_THREADS["Saturation"] / 2)
         except (ValueError, IndexError):
             pass
-
