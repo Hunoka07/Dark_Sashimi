@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import threading
 
-VERSION = "2.0"
+VERSION = "1.0"
 CREATOR = "Created by TLG"
-PROJECT_NAME = "Dark Sashimi: AI"
+PROJECT_NAME = "Dark Sashimi"
 REQUIRED_PYTHON_VERSION = (3, 8)
 
 DEFAULT_THREADS = {
@@ -28,7 +28,6 @@ PROXY_TIMEOUT = 6
 
 attack_stats = {
     "requests_sent": 0,
-    "sockets_opened": 0,
     "bytes_sent": 0,
     "http_ok": 0,
     "http_error": 0,
@@ -44,3 +43,4 @@ attack_stats = {
 stop_event = threading.Event()
 proxies = []
 user_agents = []
+
