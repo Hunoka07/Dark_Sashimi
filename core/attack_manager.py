@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 import time
 
 import config
 from utils.display import launch_dashboard, console
-from core.vectors.http_flood import HTTPMatrix
+from core.vectors.http_flood import HTTPHavoc
 from core.vectors.slow_loris import SlowPipe
 
 class AttackManager:
@@ -16,11 +15,11 @@ class AttackManager:
 
     def select_vector(self):
         if self.vector_choice == "1":
-            return HTTPMatrix
+            return HTTPHavoc
         elif self.vector_choice == "2":
             return SlowPipe
-        console.print(f"[bold red]Lựa chọn vector không hợp lệ. Mặc định dùng HTTP Matrix.[/bold red]")
-        return HTTPMatrix
+        console.print(f"[bold red]Lựa chọn vector không hợp lệ. Mặc định dùng HTTP Havoc.[/bold red]")
+        return HTTPHavoc
 
     def start_attack(self):
         console.print("[bold purple]Đang triển khai các vector tấn công...[/bold purple]")
@@ -36,7 +35,6 @@ class AttackManager:
 
         for thread in self.all_threads:
             thread.start()
-            time.sleep(0.001)
 
         try:
             for t in self.all_threads:
