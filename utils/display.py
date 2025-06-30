@@ -145,5 +145,3 @@ def update_threat_intelligence():
                 config.attack_stats["threat_intelligence"] = "Hệ thống phòng thủ của mục tiêu đã thích ứng. Cân nhắc dừng lại và chuyển sang chế độ 'Du kích'."
             elif total_ok > 100:
                 config.attack_stats["threat_intelligence"] = "Tấn công đang diễn ra ổn định. Máy chủ mục tiêu đang chịu áp lực lớn. Tiếp tục duy trì!"
-
-              
