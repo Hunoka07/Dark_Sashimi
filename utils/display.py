@@ -35,7 +35,7 @@ def display_main_banner():
     console.rule(f"[bold #FFD700]Hệ thống Trí tuệ Tác chiến v{config.VERSION}[/bold #FFD700]")
 
 def display_ai_report(plan):
-    report_text = Text.from_markup(escape(plan["summary_report"]), justify="left")
+    report_text = Text(plan["summary_report"], justify="left")
     report_panel = Panel(
         report_text,
         title="[bold gold1]Báo cáo từ AI Trợ chiến[/bold gold1]",
@@ -44,12 +44,10 @@ def display_ai_report(plan):
     )
     
     table = Table(show_header=False, box=None, padding=0)
-    table.add_column(style="cyan")
-    table.add_column(style="white")
-    table.add_row(Text.from_markup("Mức độ nguy hiểm:"), Text.from_markup(plan["threat_level"]))
-    table.add_row(Text.from_markup("Vector đề xuất:"), Text.from_markup(f"[bold green]{escape(plan['vector'])}[/bold green]"))
-    table.add_row(Text.from_markup("Cường độ đề xuất:"), Text.from_markup(f"[bold green]{escape(plan['mode'])}[/bold green]"))
-    table.add_row(Text.from_markup("Số luồng đề xuất:"), Text.from_markup(f"[bold green]{plan['threads']}[/bold green]"))
+    table.add_row(Text("Mức độ nguy hiểm:", style="cyan"), Text.from_markup(plan["threat_level"]))
+    table.add_row(Text("Vector đề xuất:", style="cyan"), Text(plan['vector'], style="bold green"))
+    table.add_row(Text("Cường độ đề xuất:", style="cyan"), Text(plan['mode'], style="bold green"))
+    table.add_row(Text("Số luồng đề xuất:", style="cyan"), Text(str(plan['threads']), style="bold green"))
     
     console.print(report_panel)
     console.print(table)
@@ -82,8 +80,16 @@ def run_dashboard_loop():
     
     with Live(layout, screen=True, redirect_stderr=False, vertical_overflow="visible", refresh_per_second=5) as live:
         while not config.stop_event.is_set():
-            proxy_panel = Panel(Text(f"Tổng: [bold green]{config.attack_stats['proxy_total']:,}[/bold green]\nHoạt động: [bold cyan]{config.attack_stats['proxy_validated']:,}[/bold cyan]", justify="center"), title="[b]Proxy[/b]", border_style="yellow")
-            error_panel = Panel(Text(f"Kết nối: [red]{config.attack_stats['connect_error']:,}[/red]\nTimeout: [red]{config.attack_stats['timeout_error']:,}[/red]\nHTTP: [red]{config.attack_stats['http_error']:,}[/red]", justify="left"), title="[b]Lỗi[/b]", border_style="red")
+            proxy_panel = Panel(
+                Text(f"Tổng: [bold green]{config.attack_stats['proxy_total']:,}[/bold green]\nHoạt động: [bold cyan]{config.attack_stats['proxy_validated']:,}[/bold cyan]", justify="center"), 
+                title="[b]Proxy[/b]", 
+                border_style="yellow"
+            )
+            error_panel = Panel(
+                Text(f"Kết nối: [red]{config.attack_stats['connect_error']:,}[/red]\nTimeout: [red]{config.attack_stats['timeout_error']:,}[/red]\nHTTP: [red]{config.attack_stats['http_error']:,}[/red]", justify="left"), 
+                title="[b]Lỗi[/b]", 
+                border_style="red"
+            )
 
             elapsed = max(time.time() - config.attack_stats["start_time"], 1)
             rps = config.attack_stats["requests_sent"] / elapsed
@@ -94,16 +100,21 @@ def run_dashboard_loop():
             data_sent = config.attack_stats["bytes_sent"]
             data_str = f"{data_sent / 1024**2:.2f} MB" if data_sent > 1024**2 else f"{data_sent / 1024:.2f} KB"
             
+            # === ĐÂY LÀ PHẦN SỬA LỖI QUAN TRỌNG NHẤT ===
+            success_rate_color = "green" if success_rate > 70 else "yellow" if success_rate > 30 else "red"
+            success_rate_text = Text(f"{success_rate:.1f}%", style=f"bold {success_rate_color}")
+            # ============================================
+
             stats_table = Table(show_header=False, show_edge=False, box=None)
             stats_table.add_row(Text("RPS :", style="cyan", justify="right"), Text(f" {rps:,.1f}", style="bold white"))
-            stats_table.add_row(Text("Thành công :", style="cyan", justify="right"), Text.from_markup(f"[bold {'green' if success_rate > 70 else 'yellow' if success_rate > 30 else 'red'}]{success_rate:.1f}%[/bold]"))
+            stats_table.add_row(Text("Thành công :", style="cyan", justify="right"), success_rate_text)
             stats_table.add_row(Text("Luồng :", style="cyan", justify="right"), Text(f" {config.attack_stats['active_threads']}", style="bold white"))
             stats_table.add_row(Text("Dữ liệu :", style="cyan", justify="right"), Text(f" {data_str}", style="bold white"))
 
             main_panel = Panel(stats_table, title="[b]Hiệu suất Tấn công[/b]", border_style="green")
             
             update_threat_intelligence()
-            intel_panel = Panel(Text.from_markup(escape(config.attack_stats['threat_intelligence'])), title="[b]Tình báo Chiến thuật[/b]", border_style="magenta")
+            intel_panel = Panel(Text(config.attack_stats['threat_intelligence']), title="[b]Tình báo Chiến thuật[/b]", border_style="magenta")
 
             layout["proxy_info"].update(proxy_panel)
             layout["error_info"].update(error_panel)
@@ -134,3 +145,4 @@ def update_threat_intelligence():
             config.attack_stats["threat_intelligence"] = "Hệ thống phòng thủ của mục tiêu đang hoạt động rất hiệu quả. Cân nhắc chuyển sang chế độ 'Du kích' để tránh bị phát hiện."
         elif total_ok > 100:
             config.attack_stats["threat_intelligence"] = "Tấn công đang diễn ra ổn định. Máy chủ mục tiêu đang chịu áp lực lớn. Tiếp tục duy trì!"
+
