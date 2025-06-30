@@ -19,7 +19,7 @@ class ProxyManager:
                 res = requests.get(url, timeout=5)
                 res.raise_for_status()
                 for proxy in res.text.splitlines():
-                    if proxy.strip():
+                    if proxy.strip() and ":" in proxy:
                         self.raw_proxies.add(proxy.strip())
             except requests.exceptions.RequestException:
                 console.log(f"[yellow]Cảnh báo: Không thể lấy proxy từ {url}[/yellow]")
@@ -43,26 +43,25 @@ class ProxyManager:
             results = await asyncio.gather(*tasks)
             self.validated_proxies = [res for res in results if res is not None]
         
-        config.proxies = self.validated_proxies
+        config.proxies = [{'http': f"http://{p}", 'https': f"http://{p}"} for p in self.validated_proxies]
         config.attack_stats["proxy_validated"] = len(self.validated_proxies)
 
     def load_proxies(self):
         with console.status("[bold sky_blue2]Đang tổng hợp và kiểm tra proxy...[/bold sky_blue2]", spinner="dots12"):
             self.fetch_sources()
             if not self.raw_proxies:
-                console.log("[bold red]Không thể lấy được bất kỳ proxy nào. Tấn công có thể không hiệu quả.[/bold red]")
+                console.log("[bold red]Không thể lấy được bất kỳ proxy nào.[/bold red]")
                 return
 
             try:
                 asyncio.run(self.run_validation())
                 console.log(f"[bold green]Kiểm tra hoàn tất: Thu được {len(config.proxies)} proxy hoạt động.[/bold green]")
             except Exception as e:
-                console.log(f"[bold red]Lỗi khi kiểm tra proxy: {e}. Sử dụng danh sách thô.[/bold red]")
-                config.proxies = list(self.raw_proxies)
+                console.log(f"[bold red]Lỗi khi kiểm tra proxy: {e}.[/bold red]")
 
 def get_random_proxy():
     if config.proxies:
-        return {'http': f"http://{random.choice(config.proxies)}", 'https': f"http://{random.choice(config.proxies)}"}
+        return random.choice(config.proxies)
     return None
 
 def get_random_user_agent():
