@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import time
 from urllib.parse import urlparse
 import cloudscraper
@@ -19,7 +18,7 @@ class TargetAnalytics:
             self.results['Mục tiêu'] = self.domain
             self.check_reachability_and_headers()
         
-        if self.results.get("Trạng thái") == "[red]Không thể truy cập[/red]":
+        if "[red]Không thể truy cập[/red]" in self.results.get("Trạng thái", ""):
             self.display_report()
             return None, None
             
